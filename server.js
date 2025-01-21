@@ -18,8 +18,19 @@ io.on('connection', (socket) => {
         wins: 0,
     };
 
+    // Send the updated list of players to all clients
+    const updatePlayerList = () => {
+        io.emit('playerList', Object.keys(players).map((id) => ({
+            id,
+            pokemon: players[id].pokemon,
+        })));
+    };
+    updatePlayerList();
+
+    // Send the player's data to them
     socket.emit('playerData', players[socket.id]);
 
+    // Handle battle requests
     socket.on('battle', (opponentId) => {
         if (players[opponentId]) {
             const playerPokemon = players[socket.id].pokemon;
@@ -44,14 +55,10 @@ io.on('connection', (socket) => {
         }
     });
 
+    // Handle player disconnection
     socket.on('disconnect', () => {
         console.log('User disconnected:', socket.id);
         delete players[socket.id];
+        updatePlayerList();
     });
-});
-
-app.use(express.static('public'));
-
-server.listen(3000, () => {
-    console.log('Server is running on http://localhost:3000');
 });
