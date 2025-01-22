@@ -6,8 +6,28 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-let players = {};
-let pokemonList = Array.from({ length: 100 }, (_, i) => `Pokemon-${i + 1}`);
+const PORT = process.env.PORT || 3000;
+
+// Serve static files
+app.use(express.static('public'));
+
+// Sample Pokémon list
+const pokemonList = [
+    'Pikachu', 'Charmander', 'Bulbasaur', 'Squirtle', 'Eevee', 'Jigglypuff',
+    'Snorlax', 'Gengar', 'Machamp', 'Alakazam', 'Mewtwo', 'Mew', 'Zapdos',
+    'Moltres', 'Articuno', 'Dragonite', 'Charizard', 'Blastoise', 'Venusaur',
+    'Onix', 'Gyarados', 'Scyther', 'Electabuzz', 'Magmar', 'Lapras', 'Ditto',
+    'Vaporeon', 'Jolteon', 'Flareon', 'Kabutops', 'Aerodactyl', 'Snorlax',
+    'Dragonair', 'Arcanine', 'Tauros', 'Exeggutor', 'Rhydon', 'Porygon',
+    'Omastar', 'Kabuto', 'Hitmonlee', 'Hitmonchan', 'Chansey', 'Kangaskhan',
+    'Mr. Mime', 'Jynx', 'Electrode', 'Dugtrio', 'Magneton', 'Weezing',
+    'Muk', 'Cloyster', 'Hypno', 'Kingler', 'Seadra', 'Starmie', 'Tangela',
+    'Koffing', 'Horsea', 'Goldeen', 'Seaking', 'Staryu', 'Magikarp', 'Pinsir',
+    'Ditto', 'Vaporeon', 'Jolteon', 'Flareon', 'Kabutops', 'Aerodactyl',
+    'Articuno', 'Zapdos', 'Moltres', 'Dratini', 'Dragonair', 'Dragonite'
+];
+
+const players = {};
 
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
@@ -18,7 +38,7 @@ io.on('connection', (socket) => {
         wins: 0,
     };
 
-    // Send the updated list of players to all clients
+    // Broadcast the list of players to all clients
     const updatePlayerList = () => {
         io.emit('playerList', Object.keys(players).map((id) => ({
             id,
@@ -61,4 +81,9 @@ io.on('connection', (socket) => {
         delete players[socket.id];
         updatePlayerList();
     });
+});
+
+// Start the server
+server.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
